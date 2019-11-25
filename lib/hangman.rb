@@ -6,9 +6,28 @@ class Hangman
         @answer = generate_answer()
         @unguessed_letters = ('A'..'Z').to_a
         @guessed_letters = []
+        @penalties = 0
     end
 
     def show_board
+        system "clear"
+        puts ""
+        puts "     HANGMAN       "
+        puts "         _______"
+        puts "        |       |"
+        puts @penalties > 0 ? @penalties > 5 ? "        /¯\\     | " : "       /¯\\      |" : "        |       | "
+        puts @penalties > 0 ? @penalties > 5 ? "        x_x     | " : "       \\_/      | " : "                | "
+        puts @penalties > 1 ? "        |       | " : "                | "
+        puts @penalties > 1 ? @penalties > 2 ? @penalties > 3 ? "       /|\\      | " : "       /|       | " : "        |       | " : "                | "
+        puts @penalties > 1 ? @penalties > 2 ? @penalties > 3 ? "      / | \\     | " : "      / |       | " : "        |       | " : "                | "
+        puts @penalties > 1 ? @penalties > 2 ? @penalties > 3 ? "     /  |  \\    | " : "     /  |       | " : "        |       | " : "                | "
+        puts @penalties > 1 ? "        |       | " : "                | "
+        puts @penalties > 4 ? @penalties > 5 ? "       / \\      | " : "       /        | " : "                | "
+        puts @penalties > 4 ? @penalties > 5 ? "      /   \\     | " : "      /         | " : "                | "
+        puts @penalties > 4 ? @penalties > 5 ? "    _/     \\_   | " : "    _/          | " : "                | "
+        puts "                | "
+        puts "   _____________|_____" 
+        puts ""       
     end
 
     def check_guess
@@ -30,5 +49,6 @@ end
 
 hm = Hangman.new
 puts hm.answer
-puts "Un-Guessed Letters: #{hm.unguessed_letters}"
-puts "Guessed Letters: #{hm.guessed_letters.to_s}"
+hm.show_board
+puts "Un-Guessed Letters: #{hm.unguessed_letters.join(" ")}"
+puts "Guessed Letters: #{hm.guessed_letters.join(" ")}"
