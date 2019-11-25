@@ -2,7 +2,7 @@
 
 class String
     def is_letters?
-        self.downcase.gsub(/[^a-z]/,"") == self.downcase
+        self.upcase.gsub(/[^A-Z]/,"") == self.upcase
     end
 end
 
@@ -10,14 +10,7 @@ class Hangman
     attr_reader :gameover
 
     public
-    def initialize
-        @answer = generate_answer()
-        @unguessed_letters = ('A'..'Z').to_a
-        @guessed_letters = []
-        @penalties = 0
-        @gameover = false
-    end
-
+    
     def welcome_message
         system "clear"
         puts "     HANGMAN       "
@@ -36,47 +29,70 @@ class Hangman
         puts "Press ENTER to begin"
         gets.chomp
     end
-
-    def show_board
+    
+    def show_gallows
         system "clear"
         puts ""
-        puts "     HANGMAN       "
+        puts "   CHUCKSEF'S ULTIMATE HANGMAN"
         puts "         _______"
         puts "        |       |"
-        puts @penalties > 0 ? @penalties > 5 ? "        /¯\\     | " : "       /¯\\      |" : "        |       | "
-        puts @penalties > 0 ? @penalties > 5 ? "        x_x     | " : "       \\_/      | " : "                | "
-        puts @penalties > 1 ? "        |       | " : "                | "
-        puts @penalties > 1 ? @penalties > 2 ? @penalties > 3 ? "       /|\\      | " : "       /|       | " : "        |       | " : "                | "
-        puts @penalties > 1 ? @penalties > 2 ? @penalties > 3 ? "      / | \\     | " : "      / |       | " : "        |       | " : "                | "
-        puts @penalties > 1 ? @penalties > 2 ? @penalties > 3 ? "     /  |  \\    | " : "     /  |       | " : "        |       | " : "                | "
-        puts @penalties > 1 ? "        |       | " : "                | "
-        puts @penalties > 4 ? @penalties > 5 ? "       / \\      | " : "       /        | " : "                | "
-        puts @penalties > 4 ? @penalties > 5 ? "      /   \\     | " : "      /         | " : "                | "
-        puts @penalties > 4 ? @penalties > 5 ? "    _/     \\_   | " : "    _/          | " : "                | "
-        puts "                | "
+        puts @penalties > 0 ? @penalties > 5 ? "        /¯\\     |" : "       /¯\\      |" : "        |       |"
+        puts @penalties > 0 ? @penalties > 5 ? "        x_x     | " : "       \\_/      |" : "                |"
+        puts @penalties > 1 ? "        |       |" : "                |"
+        puts @penalties > 1 ? @penalties > 2 ? @penalties > 3 ? "       /|\\      |" : "       /|       |" : "        |       | " : "                | "
+        puts @penalties > 1 ? @penalties > 2 ? @penalties > 3 ? "      / | \\     |" : "      / |       |" : "        |       | " : "                | "
+        puts @penalties > 1 ? @penalties > 2 ? @penalties > 3 ? "     /  |  \\    |" : "     /  |       |" : "        |       | " : "                | "
+        puts @penalties > 1 ? "        |       |" : "                |"
+        puts @penalties > 4 ? @penalties > 5 ? "       / \\      |" : "       /        |" : "                |"
+        puts @penalties > 4 ? @penalties > 5 ? "      /   \\     |" : "      /         |" : "                |"
+        puts @penalties > 4 ? @penalties > 5 ? "    _/     \\_   |" : "    _/          |" : "                |"
+        puts "                |"
         puts "   _____________|_____" 
-        puts ""       
+        puts ""
     end
-
+    
+    def show_board
+        puts "ANSWER:  #{@answer_readout.join(" ")}"
+        2.times { puts "" }
+        end
+    
     def next_round
+        show_gallows
         show_board
         puts "Guess a Letter"
         is_valid_guess = false
         while is_valid_guess != true do
-            guess = gets.chomp
+            guess = gets.chomp.upcase
             is_valid_guess = validate_guess(guess)
             puts "Invalid guess. Enter a single Letter A - Z" if !is_valid_guess 
         end
-        gets.chomp
+        check_guess(guess)
     end
     
     private
+    def initialize
+        @answer = generate_answer()
+        @unguessed_letters = ('A'..'Z').to_a
+        @answer_readout = generate_readout(@answer)
+        @penalties = 0
+        @gameover = false
+    end
     
     def validate_guess(guess)
         return guess == "" || guess.length > 1 || !guess.is_letters? ? false : true
     end
     
-    def check_guess
+    def check_guess(guess)
+        changed = false
+        @answer.chars.each_with_index do |char, i|
+            if char == guess
+                @answer_readout[i] = char.upcase
+                changed = true
+
+            end
+        end
+        @penalties += 1 unless changed
+
     end
 
     def generate_answer
@@ -89,6 +105,12 @@ class Hangman
             end
         end
         valid_words[rand(valid_words.length-1)].upcase
+    end
+
+    def generate_readout(ans)
+        x = []
+        ans.length.times { x << "_" }
+        x
     end
 end
 
