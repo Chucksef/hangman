@@ -1,0 +1,2 @@
+U:Hangman{:answerI"PROSAICNESS:ET:penaltiesi
+:answer_readout[I"P;TI"R;TI"_;TI"S;TI"A;TI"_;TI"C;TI"N;TI"E;TI"S;TI"S;T

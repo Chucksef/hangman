@@ -39,8 +39,12 @@ class Hangman
         puts "incorrect guesses, you will be executed for murder"
         puts "or piracy or whatever. GOOD LUCK!"
         puts ""
-        puts "Press ENTER to begin"
-        gets.chomp
+        puts "1 - Play Game"
+        puts "2 - Load Game"
+        puts "3 - Quit"
+        puts ""
+        choice = gets.chomp
+        choice
     end
     
     def show_gallows
@@ -50,7 +54,7 @@ class Hangman
         puts "         _______"
         puts "        |       |"
         puts @penalties > 0 ? @penalties > 5 ? "        /¯\\     |" : "       /¯\\      |" : "        |       |"
-        puts @penalties > 0 ? @penalties > 5 ? "        x_x     | " : "       \\_/      |" : "                |"
+        puts @penalties > 0 ? @penalties > 5 ? "        x_x     | " : "       o_o      |" : "                |"
         puts @penalties > 1 ? "        |       |" : "                |"
         puts @penalties > 1 ? @penalties > 2 ? @penalties > 3 ? "       /|\\      |" : "       /|       |" : "        |       | " : "                | "
         puts @penalties > 1 ? @penalties > 2 ? @penalties > 3 ? "      / | \\     |" : "      / |       |" : "        |       | " : "                | "
@@ -82,16 +86,48 @@ class Hangman
         check_guess(guess)
     end
     
+    def marshal_load(serialized_game)
+        @answer = serialized_game[:answer]
+        @penalties = serialized_game[:penalties]
+        @answer_readout = serialized_game[:answer_readout]
+    end
+    
     private
     def initialize
         @answer = generate_answer()
-        @unguessed_letters = ('A'..'Z').to_a
+        # @unguessed_letters = ('A'..'Z').to_a
         @answer_readout = generate_readout(@answer)
         @penalties = 0
         @gameover = false
     end
     
+    def marshal_dump
+        {}.tap do |result|
+            result[:answer]          = @answer
+            result[:penalties]       = @penalties
+            result[:answer_readout]  = @answer_readout
+        end
+    end
+
+    def exit_game
+        system "clear"
+        exit
+    end
+
+    def save_game
+        Dir.mkdir("saves") unless Dir.exists?("saves")
+        savefile = File.open("saves/save.txt","wb")
+        savefile.puts Marshal.dump(self)
+        savefile.close
+        exit
+    end
+
     def validate_guess(guess)
+        if guess.downcase == "save"
+            save_game()
+        elsif guess.downcase == "exit" || guess.downcase == "quit"
+            exit_game()
+        end
         return guess == "" || guess.length > 1 || !guess.is_letters? ? false : true
     end
     
@@ -128,9 +164,21 @@ end
 
 #gameflow
 
+
 hm = Hangman.new
-hm.welcome_message
+choice = hm.welcome_message
+
+if choice == "1"
+    #do nothing
+elsif choice == "2"
+    hm = Marshal.load(File.binread('saves/save.txt'))
+elsif choice == "3"
+    system "clear"
+    exit
+end
+
 while !hm.gameover do
     hm.next_round
 end
+
 hm.evaluate_game
