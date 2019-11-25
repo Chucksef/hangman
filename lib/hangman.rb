@@ -1,5 +1,13 @@
+#classes and methods go here
+
+class String
+    def is_letters?
+        self.downcase.gsub(/[^a-z]/,"") == self.downcase
+    end
+end
+
 class Hangman
-    attr_reader :answer, :unguessed_letters, :guessed_letters
+    attr_reader :gameover
 
     public
     def initialize
@@ -7,6 +15,26 @@ class Hangman
         @unguessed_letters = ('A'..'Z').to_a
         @guessed_letters = []
         @penalties = 0
+        @gameover = false
+    end
+
+    def welcome_message
+        system "clear"
+        puts "     HANGMAN       "
+        puts ""
+        puts "Welcome to Hangman!"
+        puts ""
+        puts "You will be presented with a secret code."
+        puts "To play, simply guess a single letter at a time."
+        puts "If the letter you guessed is in the code, you will"
+        puts "be shown the position of the guessed letter. If the"
+        puts "letter you guessed is not in the code, you will move"
+        puts "one step closer to EXECUTION! If you reach six"
+        puts "incorrect guesses, you will be executed for murder"
+        puts "or piracy or whatever. GOOD LUCK!"
+        puts ""
+        puts "Press ENTER to begin"
+        gets.chomp
     end
 
     def show_board
@@ -30,10 +58,27 @@ class Hangman
         puts ""       
     end
 
+    def next_round
+        show_board
+        puts "Guess a Letter"
+        is_valid_guess = false
+        while is_valid_guess != true do
+            guess = gets.chomp
+            is_valid_guess = validate_guess(guess)
+            puts "Invalid guess. Enter a single Letter A - Z" if !is_valid_guess 
+        end
+        gets.chomp
+    end
+    
+    private
+    
+    def validate_guess(guess)
+        return guess == "" || guess.length > 1 || !guess.is_letters? ? false : true
+    end
+    
     def check_guess
     end
 
-    private
     def generate_answer
         dict = File.open("5desk.txt", "r")
         valid_words = []
@@ -47,8 +92,10 @@ class Hangman
     end
 end
 
+#gameflow
+
 hm = Hangman.new
-puts hm.answer
-hm.show_board
-puts "Un-Guessed Letters: #{hm.unguessed_letters.join(" ")}"
-puts "Guessed Letters: #{hm.guessed_letters.join(" ")}"
+hm.welcome_message
+while !hm.gameover do
+    hm.next_round
+end
