@@ -10,6 +10,19 @@ class Hangman
     attr_reader :gameover
 
     public
+
+    def evaluate_game
+        show_gallows
+        show_board
+        if @penalties > 5
+            puts "You died a horrible death :("
+            puts "The Answer was: #{@answer}"
+            puts ""
+        else
+            puts "YOU WIN!!!!"
+            puts ""
+        end
+    end 
     
     def welcome_message
         system "clear"
@@ -54,7 +67,7 @@ class Hangman
     def show_board
         puts "ANSWER:  #{@answer_readout.join(" ")}"
         2.times { puts "" }
-        end
+    end
     
     def next_round
         show_gallows
@@ -88,11 +101,10 @@ class Hangman
             if char == guess
                 @answer_readout[i] = char.upcase
                 changed = true
-
             end
         end
         @penalties += 1 unless changed
-
+        @gameover = true if @penalties > 5 || @answer_readout.join() == @answer
     end
 
     def generate_answer
@@ -121,3 +133,4 @@ hm.welcome_message
 while !hm.gameover do
     hm.next_round
 end
+hm.evaluate_game
